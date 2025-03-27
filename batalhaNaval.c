@@ -1,39 +1,73 @@
 #include <stdio.h>
+#include <stdbool.h>
 
-// Definimos o tamanho do tabuleiro e dos navios
-#define SIZE 10       // Tamanho do tabuleiro: 10x10
-#define SHIP_SIZE 3   // Tamanho de cada navio: 3 posições
+#define SIZE 10
+#define SHIP_SIZE 3
 
-int main() {
-    // Criamos uma matriz para representar o tabuleiro, preenchendo inicialmente com zeros (água)
-    int board[SIZE][SIZE] = {0};
-
-    // Escolhemos as posições iniciais dos navios
-    int ship1_row = 2, ship1_col = 3; // Início do navio horizontal
-    int ship2_row = 5, ship2_col = 6; // Início do navio vertical
-
-    // Colocamos o navio horizontal no tabuleiro
-    // Percorremos as posições necessárias e marcamos com 3 para indicar o navio
-    for (int i = 0; i < SHIP_SIZE; i++) {
-        board[ship1_row][ship1_col + i] = 3;
-    }
-
-    // Colocamos o navio vertical no tabuleiro
-    // Da mesma forma, usamos um loop para marcar as posições com 3
-    for (int i = 0; i < SHIP_SIZE; i++) {
-        board[ship2_row + i][ship2_col] = 3;
-    }
-
-    // Mostramos o tabuleiro na tela
-    // Dois loops aninhados percorrem todas as linhas e colunas do tabuleiro
-    // Imprimimos cada valor seguido de um espaço para clareza
+// Preenche o tabuleiro com zeros (0), representando água
+void inicializarTabuleiro(int tabuleiro[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            printf("%d ", board[i][j]);
+            tabuleiro[i][j] = 0;
         }
-        // Após cada linha completa do tabuleiro, pulamos para a próxima linha
+    }
+}
+
+// Verifica se um navio pode ser colocado em uma posição específica
+bool posicaoValida(int tabuleiro[SIZE][SIZE], int linha, int coluna, int direcao, bool diagonal) {
+    for (int i = 0; i < SHIP_SIZE; i++) {
+        int x = linha + i * (diagonal || direcao == 0);
+        int y = coluna + i * (diagonal || direcao == 1);
+        
+        // Verifica se está dentro do tabuleiro e se não tem outro navio no caminho
+        if (x >= SIZE || y >= SIZE || tabuleiro[x][y] != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Coloca o navio no tabuleiro
+void colocarNavio(int tabuleiro[SIZE][SIZE], int linha, int coluna, int direcao, bool diagonal) {
+    for (int i = 0; i < SHIP_SIZE; i++) {
+        int x = linha + i * (diagonal || direcao == 0);
+        int y = coluna + i * (diagonal || direcao == 1);
+        tabuleiro[x][y] = 3; // Marca onde o navio está
+    }
+}
+
+// Mostra o tabuleiro no console
+void mostrarTabuleiro(int tabuleiro[SIZE][SIZE]) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf("%d ", tabuleiro[i][j]);
+        }
         printf("\n");
     }
+}
 
+int main() {
+    int tabuleiro[SIZE][SIZE];
+    inicializarTabuleiro(tabuleiro);
+    
+    // Colocando dois navios em linha reta (horizontal ou vertical)
+    if (posicaoValida(tabuleiro, 0, 0, 0, false)) {
+        colocarNavio(tabuleiro, 0, 0, 0, false); // Navio na horizontal
+    }
+    if (posicaoValida(tabuleiro, 2, 2, 1, false)) {
+        colocarNavio(tabuleiro, 2, 2, 1, false); // Navio na vertical
+    }
+    
+    // Colocando dois navios na diagonal
+    if (posicaoValida(tabuleiro, 5, 5, 0, true)) {
+        colocarNavio(tabuleiro, 5, 5, 0, true); // Navio na diagonal principal
+    }
+    if (posicaoValida(tabuleiro, 7, 2, 1, true)) {
+        colocarNavio(tabuleiro, 7, 2, 1, true); // Navio na diagonal secundária
+    }
+    
+    // Exibe o tabuleiro
+    mostrarTabuleiro(tabuleiro);
+    
     return 0;
 }
